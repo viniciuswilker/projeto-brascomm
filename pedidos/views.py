@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 
+from .models import Pedido, ItemPedido
 
 def login_view(request):
 
@@ -29,10 +30,21 @@ def login_view(request):
 
     return render(request, 'pedidos/login.html')
 
-    
+
 
 def home(request):
-    pass
+    pedido = Pedido.objects.all().order_by('-data')
+
+    status_filtro = request.GET.get('status')
+    if status_filtro:
+        pedidos = pedidos.filter(status=status)
+    
+    contexto = {
+        'pedidos': pedidos,
+    }
+    return render(request, 'pedidos/home.html', contexto)
+
+
 
 
 def logout_view(request):
