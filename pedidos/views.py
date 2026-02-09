@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 
 from .models import Pedido, ItemPedido
 
@@ -17,7 +18,7 @@ def login_view(request):
 
         if not usuario or not senha:
             messages.error(request, "Preencha todos os dados.")
-            return (request, 'login.html')
+            return render(request, 'login.html')
 
         
         user = authenticate(request, username=usuario, password=senha)
@@ -30,6 +31,7 @@ def login_view(request):
                 messages.error(request, "Sua conta está desativada.")
         else:
             messages.error(request, "Credenciais inválidas. Tente novamente.")
+        
 
     return render(request, 'login.html')
 
@@ -60,13 +62,14 @@ def logout_view(request):
 
 
 # pedidos
+@csrf_exempt
 @login_required
 def criar_pedido(request):
     if request.method == 'POST':
         novo = Pedido.objects.create()
         return JsonResponse({'id': novo.id, 'status': novo.status})
 
-
+@csrf_exempt
 def fechar_pedido(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido)
 
@@ -77,7 +80,8 @@ def fechar_pedido(request, pedido_id):
     pedido.save()
     return JsonResponse({'sucess' :True, 'status': "FECHADO"})
 
-
+@csrf_exempt
+@login_required
 def cancelar_pedido(request, pedido_id):
     pedido_id = get_object_or_404(Pedido, id=pedido_id)
 

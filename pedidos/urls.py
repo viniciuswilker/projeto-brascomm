@@ -8,9 +8,9 @@ urlpatterns = [
 
     path('api/pedidos/novo/', views.criar_pedido, name='api_criar_pedido'),
     # path('api/pedidos/', views.listar_pedidos, name='api_listar_pedidos'),
+    path('api/pedidos/<int:pedido_id>/fechar/', views.fechar_pedido, name='api_fechar_pedido'),
+    path('api/pedidos/<int:pedido_id>/cancelar/', views.cancelar_pedido, name='api_cancelar_pedido'),
     # path('api/pedidos/<int:pedido_id>/', views.detalhar_pedido, name='api_detalhar_pedido'),
-    # path('api/pedidos/<int:pedido_id>/fechar/', views.fechar_pedido, name='api_fechar_pedido'),
-    # path('api/pedidos/<int:pedido_id>/cancelar/', views.cancelar_pedido, name='api_cancelar_pedido'),
 
     # path('api/pedidos/<int:pedido_id>/itens/add/', views.adicionar_item, name='api_adicionar_item'),
     # path('api/itens/<int:item_id>/editar/', views.editar_item, name='api_editar_item'),
