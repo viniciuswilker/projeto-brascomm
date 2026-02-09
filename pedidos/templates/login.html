@@ -4,32 +4,41 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+
+    <link rel="stylesheet" href="{% static 'pedidos/css/login.css' %}">
 </head>
 
 <body>
 
-    <h2>Login</h2>
+    <main>
+        <form method="post">
+            {% csrf_token %}
 
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+            <h2>Login</h2>
 
-    <form method="post">
-        {% csrf_token %}
+            <div class="campo">
+                <label for="usuario">Usuário</label>
+                <input type="text" id="usuario" name="usuario" required>
+            </div>
 
-        <label>Usuário:</label><br>
-        <input type="text" name="usuario"><br><br>
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required>
+            </div>
 
-        <label>Senha:</label><br>
-        <input type="password" name="senha"><br><br>
+            <button type="submit">Entrar</button>
 
-        <button type="submit">Entrar</button>
-    </form>
+            {% if messages %}
+            <ul class="mensagens">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </form>
+    </main>
 
 </body>
 
