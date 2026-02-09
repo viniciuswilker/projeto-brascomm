@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 from .models import Pedido, ItemPedido
 
@@ -31,7 +32,7 @@ def login_view(request):
     return render(request, 'pedidos/login.html')
 
 
-
+@login_required
 def home(request):
     pedido = Pedido.objects.all().order_by('-data')
 
@@ -39,6 +40,10 @@ def home(request):
     if status_filtro:
         pedidos = pedidos.filter(status=status)
     
+    busca = request.GET.get('busca')
+    if busca:
+        pedidos = pedidos.filter(id=busca)
+
     contexto = {
         'pedidos': pedidos,
     }
@@ -46,7 +51,7 @@ def home(request):
 
 
 
-
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('login')
