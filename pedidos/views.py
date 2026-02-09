@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Pedido, ItemPedido
 
+@csrf_exempt
 def login_view(request):
 
     if request.user.is_authenticated:
@@ -15,7 +17,7 @@ def login_view(request):
 
         if not usuario or not senha:
             messages.error(request, "Preencha todos os dados.")
-            return (request, 'pedidos/login.html')
+            return (request, 'login.html')
 
         
         user = authenticate(request, username=usuario, password=senha)
@@ -29,7 +31,7 @@ def login_view(request):
         else:
             messages.error(request, "Credenciais inválidas. Tente novamente.")
 
-    return render(request, 'pedidos/login.html')
+    return render(request, 'login.html')
 
 
 @login_required
@@ -47,7 +49,7 @@ def home(request):
     contexto = {
         'pedidos': pedidos,
     }
-    return render(request, 'pedidos/home.html', contexto)
+    return render(request, 'home.html', contexto)
 
 
 
@@ -55,3 +57,30 @@ def home(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+# pedidos
+@login_required
+def criar_pedido(request):
+    if request.method == 'POST':
+        novo = Pedido.objects.create()
+        return JsonResponse({'id': novo.id, 'status': novo.status})
+
+
+def fechar_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido)
+
+    if not pedido.itens.exists():
+        return JsonResponse({'error': 'Não pode fechar pedido sem itens'}, status=400)
+
+    pedido.status = "FECHADO"
+    pedido.save()
+    return JsonResponse({'sucess' :True, 'status': "FECHADO"})
+
+
+def cancelar_pedido(request, pedido_id):
+    pedido_id = get_object_or_404(Pedido, id=pedido_id)
+
+    pedido.status = 'CANCELADO'
+    pedido.save()
+    return JsonResponse({'sucess': True, 'status': "CANCELADO"})
