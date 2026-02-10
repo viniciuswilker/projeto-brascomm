@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.http import JsonResponse
 
 from .models import Pedido, ItemPedido
 
@@ -38,11 +39,11 @@ def login_view(request):
 
 @login_required
 def home(request):
-    pedido = Pedido.objects.all().order_by('-data')
+    pedidos = Pedido.objects.all().order_by('-data')
 
     status_filtro = request.GET.get('status')
     if status_filtro:
-        pedidos = pedidos.filter(status=status)
+        pedidos = pedidos.filter(status=status_filtro)
     
     busca = request.GET.get('busca')
     if busca:
@@ -51,6 +52,7 @@ def home(request):
     contexto = {
         'pedidos': pedidos,
     }
+
     return render(request, 'home.html', contexto)
 
 
@@ -88,3 +90,4 @@ def cancelar_pedido(request, pedido_id):
     pedido.status = 'CANCELADO'
     pedido.save()
     return JsonResponse({'sucess': True, 'status': "CANCELADO"})
+

@@ -1,0 +1,61 @@
+ body {
+     font-family: sans-serif;
+     margin: 40px;
+     color: #333;
+ }
+
+ table {
+     width: 100%;
+     border-collapse: collapse;
+     margin-top: 20px;
+ }
+
+ th,
+ td {
+     border: 1px solid #ddd;
+     padding: 12px;
+     text-align: left;
+ }
+
+ th {
+     background-color: #f4f4f4;
+ }
+
+ .topo {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+ }
+
+ .btn {
+     padding: 8px 16px;
+     cursor: pointer;
+     border: 1px solid #333;
+     background: #fff;
+ }
+
+ .btn:hover {
+     background: #eee;
+ }
+
+ .status-rascunho {
+     color: #856404;
+     background: #fff3cd;
+     padding: 4px;
+     border-radius: 4px;
+ }
+
+ .status-fechado {
+     color: #155724;
+     background: #d4edda;
+     padding: 4px;
+     border-radius: 4px;
+ }
+
+ .alerta {
+     padding: 10px;
+     margin-bottom: 20px;
+     border: 1px solid #f00;
+     color: #f00;
+     display: none;
+ }

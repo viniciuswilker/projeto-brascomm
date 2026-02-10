@@ -1,11 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sistema de Pedidos</title>
 </head>
+
 <body>
-    
+
+    <div class="topo">
+        <h1>Lista de Pedidos</h1>
+        <div>
+            <span>Logado como: <strong>{{ user.username }}</strong></span>
+            <a href="{% url 'logout' %}">Sair</a>
+        </div>
+    </div>
+
+    <div id="mensagem-erro" class="alerta"></div>
+
+    <button class="btn" onclick="criarPedido()">+ Criar Novo Pedido</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-pedidos">
+            <tr>
+                <td colspan="5">Buscando pedidos no servidor...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        const tokenCSRF = "{{ csrf_token }}";
+
+        async function carregarPedidos() {
+            try {
+                const resposta = await fetch("{% url 'api_listar_pedidos' %}");
+                const pedidos = await resposta.json();
+
+                const corpoTabela = document.getElementById('tabela-pedidos');
+                corpoTabela.innerHTML = '';
+
+                if (pedidos.length === 0) {
+                    corpoTabela.innerHTML = '<tr><td colspan="5">Nenhum pedido encontrado.</td></tr>';
+                    return;
+                }
+
+                pedidos.forEach(p => {
+                    const classeStatus = p.status === 'RASCUNHO' ? 'status-rascunho' : 'status-fechado';
+                    corpoTabela.innerHTML += `
+                        <tr>
+                            <td>${p.id}</td>
+                            <td>${p.data}</td>
+                            <td><span class="${classeStatus}">${p.status}</span></td>
+                            <td>R$ ${p.total.toFixed(2)}</td>
+                            <td>
+                                <button class="btn" onclick="abrirPedido(${p.id})">Editar/Ver</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (erro) {
+                mostrarErro("Erro ao carregar a lista.");
+            }
+        }
+
+        async function criarPedido() {
+            try {
+                const resposta = await fetch("{% url 'api_criar_pedido' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': tokenCSRF }
+                });
+
+                if (resposta.ok) {
+                    carregarPedidos();
+                } else {
+                    mostrarErro("Não foi possível criar o pedido.");
+                }
+            } catch (erro) {
+                mostrarErro("Erro na requisição.");
+            }
+        }
+
+        function mostrarErro(texto) {
+            const div = document.getElementById('mensagem-erro');
+            div.innerText = texto;
+            div.style.display = 'block';
+        }
+
+        function abrirPedido(id) {
+            alert("Vamos abrir o pedido " + id + " para adicionar itens em breve.");
+        }
+
+        carregarPedidos();
+    </script>
 </body>
+
 </html>
