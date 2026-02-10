@@ -82,10 +82,14 @@
             corpo.innerHTML = ''
 
             itens.forEach(i => {
-                let botaoExcluir = ''
+
+                let botoes = ''
 
                 if (statusPedido === 'RASCUNHO') {
-                    botaoExcluir = `<button class="btn btn-excluir" onclick="removerItem(${i.id})">Remover</button>`;
+                    botoes = `
+                <button class="btn" onclick='abrirModalEdicao(${JSON.stringify(i)})'>Editar</button>
+                <button class="btn btn-excluir" onclick="removerItem(${i.id})">Remover</button>
+            `;
                 }
 
                 corpo.innerHTML += `
@@ -94,7 +98,7 @@
                     <td>${i.quantidade}</td>
                     <td>${i.valor_unitario.toFixed(2)}</td>
                     <td>${i.subtotal.toFixed(2)}</td>
-                    <td>${botaoExcluir}</td>
+                    <td>${botoes}</td>
                 </tr>
                 `
             });

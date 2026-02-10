@@ -78,7 +78,7 @@
                     const classeStatus = p.status === 'RASCUNHO' ? 'status-rascunho' : 'status-fechado';
                     corpoTabela.innerHTML += `
                         <tr>
-                            <td>${p.id}</td>
+                            <td>#${p.id}</td>
                             <td>${p.data}</td>
                             <td><span class="${classeStatus}">${p.status}</span></td>
                             <td>R$ ${p.total.toFixed(2)}</td>
@@ -132,7 +132,6 @@
                 valor_unitario: valorUnitario
             }
 
-            console.log(dados)
             try {
 
                 const resposta = await fetch("{% url 'api_criar_pedido' %}", {
