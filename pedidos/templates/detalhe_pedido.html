@@ -52,7 +52,7 @@
         const tokenCSRF = "{{ csrf_token }}"
 
         async function carregarItens() {
-            const resposta = await fetch(`api/pedido/${pedidoId}/itens/`)
+            const resposta = await fetch(`/api/pedido/${pedidoId}/itens/`)
             const itens = await resposta.json()
             const corpo = document.getElementById('tabela-itens')
             corpo.innerHTML = ''
@@ -80,7 +80,7 @@
 
             }
 
-            const resposta = await fetch(`api/pedidos/${pedidoId}/itens/add/`, {
+            const resposta = await fetch(`/api/pedidos/${pedidoId}/itens/add/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,6 +88,19 @@
                 },
                 body: JSON.stringify(dados)
             })
+
+            if (resposta.ok) {
+                const resJson = await resposta.json()
+                document.getElementById('total-pedido').innerText = resJson.total_pedido.toFixed(2);
+                carregarItens()
+
+                document.getElementById('desc').value = ''
+                document.getElementById('qtd').value = ''
+                document.getElementById('valor').value = ''
+            } else {
+                const erro = await resposta.json();
+                alert(erro.error || "Erro ao adicionar item");
+            }
 
         }
 

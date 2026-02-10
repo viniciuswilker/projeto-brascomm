@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import JsonResponse
+import json
 
 from .models import Pedido, ItemPedido
 
@@ -147,18 +148,23 @@ def adicionar_item(request, pedido_id):
     
     pedido = get_object_or_404(Pedido, id=pedido_id)
 
-    if pedido.status != 'RACUNHO':
+    print(f"\n>>> Verificando pedido {pedido_id}. Status atual: '{pedido.status}'")
+
+    if pedido.status != 'RASCUNHO':
+        print("ERRO: Pedido nao e rascunho.")
         return JsonResponse({'error': 'Esse pedido já está fechado'}, status=400)
 
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            
+            print(f"Dados recebidos no JSON: {data}") 
+
             desc = data.get('descricao')
             qtd = int(data.get('quantidade', 0))
             valor = float(data.get('valor_unitario', 0))
 
             if not desc or qtd <= 0:
+                print(f"ERRO: Validacao falhou. Desc: {desc}, Qtd: {qtd}")
                 return JsonResponse({'error': 'Descrição e quantidades inválidas'}, status=400)
             
             ItemPedido.objects.create(
@@ -167,9 +173,12 @@ def adicionar_item(request, pedido_id):
                 quantidade=qtd,
                 valor_unitario=valor
             )
+            pedido.refresh_from_db()
 
+            print(f"SUCESSO: Item criado. Novo total: {pedido.total}")
             return JsonResponse({'sucesso': True, 'total_pedido': float(pedido.total)})
 
         except Exception as e:
+            print(f"EXCECAO: {str(e)}")
             return JsonResponse({'error': 'Erro ao processar dados.'}, status=400)
 
