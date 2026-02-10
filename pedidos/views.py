@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db import transaction
+
 import json
 
 from .models import Pedido, ItemPedido
@@ -78,8 +80,33 @@ def logout_view(request):
 @login_required
 def criar_pedido(request):
     if request.method == 'POST':
-        novo = Pedido.objects.create()
-        return JsonResponse({'id': novo.id, 'status': novo.status})
+        try:
+            data = json.loads(request.body)
+            desc = data.get('descricao')
+            qtd = int(data.get('quantidade', 0))
+            valor = float(data.get('valor_unitario', 0))
+
+            if not desc or qtd < 0:
+                print('Você não pode criar um pedido sem um item')
+                return JsonResponse({"error": "Você não pode criar um pedido sem um item"}, status=400)
+
+            with transaction.atomic():
+
+                novo_pedido = Pedido.objects.create()
+
+                ItemPedido.objects.create(
+                    pedido=novo_pedido,
+                    descricao=desc,
+                    quantidade=qtd,
+                    valor_unitario=valor
+                )
+
+            return JsonResponse({'id': novo_pedido.id})
+        
+        except Exception as e:
+            print(f'Erro: {e}')
+            return JsonResponse({'error': 'Dados inválidos para o primeiro item.'}, status=400)
+
 
 
 @csrf_exempt
@@ -125,7 +152,7 @@ def listar_pedidos(request):
     status_filtro = request.GET.get('status')
     busca_id = request.GET.get('busca')
     
-    pedidos = Pedido.objects.all().order_by('-data')
+    pedidos = Pedido.objects.all().order_by('-id')
     
     if status_filtro:
         pedidos = pedidos.filter(status=status_filtro)

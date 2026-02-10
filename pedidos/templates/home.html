@@ -45,9 +45,9 @@
             <h3>Novo Pedido</h3>
             <p>Adicione o primeiro item para começar:</p>
 
-            <input type=" text" id="novo-item-desc" placeholder="Descrição"><br>
-            <input type="number" id="novo-item-qtd" placeholder="Qtd">
-            <input type="number" id="novo-item-valor" placeholder="Valor Unit." step="0.01"><br>
+            <input type=" text" id="novo-item-desc" placeholder="Descrição" required><br>
+            <input type="number" id="novo-item-qtd" placeholder="Qtd" required>
+            <input type="number" id="novo-item-valor" placeholder="Valor Unit." step="0.01" required><br>
 
             <div>
                 <button class="btn" onclick="fecharModal()">Cancelar</button>
@@ -112,6 +112,51 @@
 
         function fecharModal() {
             document.getElementById('modal-novo-pedido').classList.remove('ativo');
+        }
+
+        async function confirmarCriacaoPedido() {
+
+            const itemDesc = document.getElementById('novo-item-desc').value
+            const itemQtd = document.getElementById('novo-item-qtd').value
+            const valorUnitario = document.getElementById('novo-item-valor').value
+
+            if (!itemDesc || !itemQtd || !valorUnitario) {
+                alert('Preencha todos os dados')
+                return
+            }
+
+
+            const dados = {
+                descricao: itemDesc,
+                quantidade: itemQtd,
+                valor_unitario: valorUnitario
+            }
+
+            console.log(dados)
+            try {
+
+                const resposta = await fetch("{% url 'api_criar_pedido' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': tokenCSRF
+                    },
+                    body: JSON.stringify(dados)
+                })
+
+                const resultado = await resposta.json()
+
+                if (resposta.ok) {
+                    window.location.href = `/pedidos/${resultado.id}/`;
+                } else {
+                    alert("Erro: " + (resultado.error || "Falha ao criar pedido"));
+                }
+            } catch (error) {
+                alert('Erro de conexão')
+            }
+
+
+
         }
 
         carregarPedidos();
