@@ -5,5 +5,4 @@ __pycache__/
 *.pyo
 
 *.sqlite3
-
-.txt
+*.txt
