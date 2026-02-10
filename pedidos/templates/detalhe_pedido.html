@@ -15,6 +15,14 @@
         <h1>Pedido #{{pedido.id}}</h1>
         <p>Status atual: {{pedido.status}} </p>
         <p id="total-pedido">Total: R${{ pedido.total}}</p>
+
+        {% if pedido.status == 'RASCUNHO'%}
+        <button onclick="fecharPedido()">Fechar pedido</button>
+        {% endif %}
+
+        {% if pedido.status == 'FECHADO' %}
+        <button onclick="abrirPedido()">Abrir pedido</button>
+        {% endif %}
     </div>
 
     {% if pedido.status == 'RASCUNHO' %}
@@ -105,6 +113,63 @@
 
         }
 
+
+        async function fecharPedido() {
+            if (!confirm("Tem certeza que deseja fechar o pedido? Não sera possível adicionar itens"))
+                return
+
+            try {
+                const resposta = await fetch("{% url 'api_fechar_pedido' pedido.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': tokenCSRF
+                    }
+                });
+
+                const resultado = await resposta.json()
+
+                if (resposta.ok) {
+                    alert('Pedido fechado com sucesso!')
+                    window.location.reload()
+                } else {
+                    alert("erro: " + (resultado.error || "Falha ao fechar pedido"))
+                }
+
+            } catch (error) {
+                console.error("Erro na requisição:", erro);
+                alert("Erro de conexão com o servidor.");
+            }
+
+        }
+
+        async function abrirPedido() {
+            if (!confirm("Deseja abrir o pedido?"))
+                return
+
+            try {
+                const resposta = await fetch("{% url 'api_abrir_pedido' pedido.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': tokenCSRF
+                    }
+                })
+
+                const resultado = await resposta.json()
+
+                if (resposta.ok) {
+                    alert('Status alterado para Rascunho com sucesso')
+                    window.location.reload()
+                } else {
+                    alert("erro: " + (resultado.error || "Falha ao abrir o pedido"))
+
+                }
+
+            } catch (error) {
+                console.error("Erro na requisição:", erro)
+
+                alert('erro deconexão')
+            }
+        }
 
         carregarItens();
     </script>

@@ -81,6 +81,7 @@ def criar_pedido(request):
         novo = Pedido.objects.create()
         return JsonResponse({'id': novo.id, 'status': novo.status})
 
+
 @csrf_exempt
 def fechar_pedido(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
@@ -91,6 +92,21 @@ def fechar_pedido(request, pedido_id):
     pedido.status = "FECHADO"
     pedido.save()
     return JsonResponse({'sucess' :True, 'status': "FECHADO"})
+
+
+@csrf_exempt
+def abrir_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+
+    if not pedido.itens.exists():
+        return JsonResponse({'error': 'Não pode fechar pedido sem itens'}, status=400)
+
+    pedido.status = "RASCUNHO"
+    pedido.save()
+    return JsonResponse({'sucess' :True, 'status': "RASCUNHO"})
+
+
+
 
 @csrf_exempt
 @login_required
