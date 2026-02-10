@@ -106,16 +106,19 @@ def abrir_pedido(request, pedido_id):
     return JsonResponse({'sucess' :True, 'status': "RASCUNHO"})
 
 
-
-
 @csrf_exempt
 @login_required
 def cancelar_pedido(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
     
+    if not pedido.itens.exists():
+        return JsonResponse({'error': 'Não pode fechar pedido sem itens'}, status=400)
+
     pedido.status = 'CANCELADO'
     pedido.save()
     return JsonResponse({'sucess': True, 'status': "CANCELADO"})
+
+
 
 @login_required
 def listar_pedidos(request):
@@ -165,7 +168,7 @@ def adicionar_item(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
 
     if pedido.status != 'RASCUNHO':
-        return JsonResponse({'error': 'Esse pedido já está fechado'}, status=400)
+        return JsonResponse({'error': 'Esse pedido já está fechado ou foi cancelado'}, status=400)
 
     if request.method == 'POST':
         try:

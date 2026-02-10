@@ -13,16 +13,31 @@
     <div class="cabecalho">
         <a href="{% url 'home' %}">Voltar para home</a>
         <h1>Pedido #{{pedido.id}}</h1>
-        <p>Status atual: {{pedido.status}} </p>
-        <p id="total-pedido">Total: R${{ pedido.total}}</p>
+        <div class="colunas">
 
-        {% if pedido.status == 'RASCUNHO'%}
-        <button onclick="fecharPedido()">Fechar pedido</button>
-        {% endif %}
+            <div class="coluna1">
+                <p>Status atual: {{pedido.status}} </p>
+                <p id="total-pedido">Total: R${{ pedido.total}}</p>
 
-        {% if pedido.status == 'FECHADO' %}
-        <button onclick="abrirPedido()">Abrir pedido</button>
-        {% endif %}
+                {% if pedido.status == 'RASCUNHO'%}
+                <button onclick="fecharPedido()">Fechar pedido</button>
+                {% endif %}
+
+                {% if pedido.status == 'FECHADO' %}
+                <button onclick="abrirPedido()">Abrir pedido</button>
+                {% endif %}
+
+            </div>
+
+            {% if pedido.status != 'CANCELADO' %}
+            <div class="coluna2">
+                <button onclick="cancelarPedido()">Cancelar</button>
+            </div>
+            {% else %}
+            <button onclick="abrirPedido()">Abrir pedido</button>
+            {% endif %}
+
+        </div>
     </div>
 
     {% if pedido.status == 'RASCUNHO' %}
@@ -161,7 +176,7 @@
                 const resultado = await resposta.json()
 
                 if (resposta.ok) {
-                    alert('Status alterado para Rascunho com sucesso')
+                    alert('Status alterado para rascunho com sucesso')
                     window.location.reload()
                 } else {
                     alert("erro: " + (resultado.error || "Falha ao abrir o pedido"))
@@ -197,6 +212,34 @@
 
                 }
             } catch (error) {
+                console.error("Erro na requisição:", erro)
+                alert('erro de conexão')
+            }
+        }
+
+        async function cancelarPedido() {
+            if (!confirm("Tem certeza que deseja cancelar esse pedido?"))
+                return
+
+
+            try {
+
+                const resposta = await fetch("{% url 'api_cancelar_pedido' pedido.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': tokenCSRF
+                    }
+                })
+
+                const resultado = await resposta.json()
+                if (resposta.ok) {
+                    alert('Pedido cancelado com sucesso!')
+                    window.location.reload()
+                } else {
+                    alert("erro: " + (resultado.error || "Falha ao cancelar o pedido"))
+                }
+            }
+            catch (error) {
                 console.error("Erro na requisição:", erro)
                 alert('erro de conexão')
             }
