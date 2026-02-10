@@ -236,3 +236,28 @@ def remover_item(request, item_id):
         item.delete() 
         pedido.refresh_from_db()
         return JsonResponse({'sucesso': True, 'total_pedido': float(pedido.total)})
+
+        
+@csrf_exempt
+@login_required
+def editar_item(request, item_id):
+
+    item = get_object_or_404(ItemPedido, id=item_id)
+    pedido = item.pedido
+
+    if pedido.status != 'RASCUNHO':
+        return JsonResponse({'error': 'Pedido não pode ser editado'}, status=400)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            item.descricao = data.get('descricao')
+            item.quantidade = int(data.get('quantidade'))
+            item.valor_unitario = float(data.get('valor_unitario'))
+
+            item.save()
+            pedido.refresh_from_db()
+            return JsonResponse({ 'sucesso': True, 'total_pedido': float(pedido.total)}
+            )
+        except Exception as e:
+            return JsonResponse({'error': 'Dados inválidos'}, status=400)

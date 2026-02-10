@@ -24,6 +24,6 @@ urlpatterns = [
 
     path('api/pedidos/<int:pedido_id>/itens/add/', views.adicionar_item, name='api_adicionar_item'),
     path('api/itens/<int:item_id>/remover/', views.remover_item, name='api_remover_item'),
-    # path('api/itens/<int:item_id>/editar/', views.editar_item, name='api_editar_item'),
+    path('api/itens/<int:item_id>/editar/', views.editar_item, name='api_editar_item'),
     
 ]
