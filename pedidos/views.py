@@ -73,7 +73,7 @@ def criar_pedido(request):
 
 @csrf_exempt
 def fechar_pedido(request, pedido_id):
-    pedido = get_object_or_404(Pedido, id=pedido)
+    pedido = get_object_or_404(Pedido, id=pedido_id)
 
     if not pedido.itens.exists():
         return JsonResponse({'error': 'Não pode fechar pedido sem itens'}, status=400)
@@ -85,9 +85,31 @@ def fechar_pedido(request, pedido_id):
 @csrf_exempt
 @login_required
 def cancelar_pedido(request, pedido_id):
-    pedido_id = get_object_or_404(Pedido, id=pedido_id)
-
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    
     pedido.status = 'CANCELADO'
     pedido.save()
     return JsonResponse({'sucess': True, 'status': "CANCELADO"})
 
+@login_required
+def listar_pedidos(request):
+    status_filtro = request.GET.get('status')
+    busca_id = request.GET.get('busca')
+    
+    pedidos = Pedido.objects.all().order_by('-data')
+    
+    if status_filtro:
+        pedidos = pedidos.filter(status=status_filtro)
+    if busca_id:
+        pedidos = pedidos.filter(id=busca_id)
+        
+    lista_final = []
+    for p in pedidos:
+        lista_final.append({
+            'id': p.id,
+            'data': p.data.strftime('%d/%m/%Y %H:%M'),
+            'status': p.status,
+            'total': float(p.total)
+        })
+        
+    return JsonResponse(lista_final, safe=False)
