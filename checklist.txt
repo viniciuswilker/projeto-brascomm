@@ -1,4 +1,0 @@
-fazer barra de pesquisa na home
-
-
-na pagina de pedidos/id -> travar a edição por status FECHADO
