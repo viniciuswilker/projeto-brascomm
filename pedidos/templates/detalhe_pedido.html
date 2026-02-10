@@ -13,31 +13,32 @@
     <div class="cabecalho">
         <a href="{% url 'home' %}">Voltar para home</a>
         <h1>Pedido #{{pedido.id}}</h1>
-        <div class="colunas">
+        <h4>Cliente: <span>{{pedido.cliente}}</span></h2>
+            <div class="colunas">
 
-            <div class="coluna1">
-                <p>Status atual: {{pedido.status}} </p>
-                <p id="total-pedido">Total: R${{ pedido.total}}</p>
+                <div class="coluna1">
+                    <p>Status atual: {{pedido.status}} </p>
+                    <p id="total-pedido">Total: R${{ pedido.total}}</p>
 
-                {% if pedido.status == 'RASCUNHO'%}
-                <button onclick="fecharPedido()">Fechar pedido</button>
-                {% endif %}
+                    {% if pedido.status == 'RASCUNHO'%}
+                    <button onclick="fecharPedido()">Fechar pedido</button>
+                    {% endif %}
 
-                {% if pedido.status == 'FECHADO' %}
+                    {% if pedido.status == 'FECHADO' %}
+                    <button onclick="abrirPedido()">Abrir pedido</button>
+                    {% endif %}
+
+                </div>
+
+                {% if pedido.status != 'CANCELADO' %}
+                <div class="coluna2">
+                    <button onclick="cancelarPedido()">Cancelar</button>
+                </div>
+                {% else %}
                 <button onclick="abrirPedido()">Abrir pedido</button>
                 {% endif %}
 
             </div>
-
-            {% if pedido.status != 'CANCELADO' %}
-            <div class="coluna2">
-                <button onclick="cancelarPedido()">Cancelar</button>
-            </div>
-            {% else %}
-            <button onclick="abrirPedido()">Abrir pedido</button>
-            {% endif %}
-
-        </div>
     </div>
 
     {% if pedido.status == 'RASCUNHO' %}

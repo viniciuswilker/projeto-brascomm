@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import transaction
+from django.db.models import Q
 
 import json
 
@@ -83,16 +84,16 @@ def criar_pedido(request):
         try:
             data = json.loads(request.body)
             desc = data.get('descricao')
+            cliente = data.get('cliente')
             qtd = int(data.get('quantidade', 0))
             valor = float(data.get('valor_unitario', 0))
 
             if not desc or qtd < 0:
-                print('Você não pode criar um pedido sem um item')
                 return JsonResponse({"error": "Você não pode criar um pedido sem um item"}, status=400)
 
             with transaction.atomic():
 
-                novo_pedido = Pedido.objects.create()
+                novo_pedido = Pedido.objects.create(cliente=cliente)
 
                 ItemPedido.objects.create(
                     pedido=novo_pedido,
@@ -149,20 +150,23 @@ def cancelar_pedido(request, pedido_id):
 
 @login_required
 def listar_pedidos(request):
+    busca = request.GET.get('busca', '')
+
     status_filtro = request.GET.get('status')
-    busca_id = request.GET.get('busca')
     
     pedidos = Pedido.objects.all().order_by('-id')
     
     if status_filtro:
         pedidos = pedidos.filter(status=status_filtro)
-    if busca_id:
-        pedidos = pedidos.filter(id=busca_id)
+
+    if busca:
+        pedidos = pedidos.filter(Q(id__icontains=busca) | Q(cliente__icontains=busca))
         
     lista_final = []
     for p in pedidos:
         lista_final.append({
             'id': p.id,
+            'cliente': p.cliente,
             'data': p.data.strftime('%d/%m/%Y %H:%M'),
             'status': p.status,
             'total': float(p.total)
@@ -237,7 +241,7 @@ def remover_item(request, item_id):
         pedido.refresh_from_db()
         return JsonResponse({'sucesso': True, 'total_pedido': float(pedido.total)})
 
-        
+
 @csrf_exempt
 @login_required
 def editar_item(request, item_id):

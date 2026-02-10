@@ -93,3 +93,12 @@
         padding: 10px;
         box-sizing: border-box;
     }
+
+
+    #filtro-busca {
+        width: 20%;
+        margin-bottom: 12px;
+        padding: 10px;
+        box-sizing: border-box;
+        margin-top: 15px
+    }

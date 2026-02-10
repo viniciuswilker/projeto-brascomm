@@ -23,10 +23,26 @@
 
     <button class="btn" onclick="criarPedido()">+ Criar Novo Pedido</button>
 
+    <div class="filtros">
+        <input type="text" id="filtro-busca" placeholder="Buscar por número...">
+
+        <select id="filtro-status" style="padding: 8px; border: 1px solid #333;">
+            <option value="">Todos os Status</option>
+            <option value="RASCUNHO">Rascunho</option>
+            <option value="FECHADO">Fechado</option>
+            <option value="CANCELADO">Cancelado</option>
+        </select>
+
+        <button class="btn" onclick="carregarPedidos()">Filtrar</button>
+        <button class="btn" onclick="limparFiltros()">Limpar</button>
+    </div>
+
+
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Numero</th>
+                <th>Cliente</th>
                 <th>Data</th>
                 <th>Status</th>
                 <th>Total</th>
@@ -43,9 +59,11 @@
     <div id="modal-novo-pedido" style="display: none;">
         <div class="modal-content">
             <h3>Novo Pedido</h3>
+            <input type="text" id="nome-cliente" placeholder="Cliente" required><br>
+
             <p>Adicione o primeiro item para começar:</p>
 
-            <input type=" text" id="novo-item-desc" placeholder="Descrição" required><br>
+            <input type="text" id="novo-item-desc" placeholder="Descrição" required><br>
             <input type="number" id="novo-item-qtd" placeholder="Qtd" required>
             <input type="number" id="novo-item-valor" placeholder="Valor Unit." step="0.01" required><br>
 
@@ -62,15 +80,23 @@
         const tokenCSRF = "{{ csrf_token }}";
 
         async function carregarPedidos() {
+
+            const busca = document.getElementById('filtro-busca').value
+            const status = document.getElementById('filtro-status').value
+
+            const params = new URLSearchParams({ busca, status }).toString()
+            const url = `{% url 'api_listar_pedidos' %}?${params}`
+
+
             try {
-                const resposta = await fetch("{% url 'api_listar_pedidos' %}");
+                const resposta = await fetch(url)
                 const pedidos = await resposta.json();
 
                 const corpoTabela = document.getElementById('tabela-pedidos');
                 corpoTabela.innerHTML = '';
 
                 if (pedidos.length === 0) {
-                    corpoTabela.innerHTML = '<tr><td colspan="5">Nenhum pedido encontrado.</td></tr>';
+                    corpoTabela.innerHTML = '<tr><td colspan="6">Nenhum pedido encontrado.</td></tr>';
                     return;
                 }
 
@@ -79,6 +105,7 @@
                     corpoTabela.innerHTML += `
                         <tr>
                             <td>#${p.id}</td>
+                            <td>${p.cliente || '---'}</td>
                             <td>${p.data}</td>
                             <td><span class="${classeStatus}">${p.status}</span></td>
                             <td>R$ ${p.total.toFixed(2)}</td>
@@ -119,14 +146,16 @@
             const itemDesc = document.getElementById('novo-item-desc').value
             const itemQtd = document.getElementById('novo-item-qtd').value
             const valorUnitario = document.getElementById('novo-item-valor').value
+            const cliente = document.getElementById('nome-cliente').value
 
-            if (!itemDesc || !itemQtd || !valorUnitario) {
+            if (!itemDesc || !itemQtd || !valorUnitario || !cliente) {
                 alert('Preencha todos os dados')
                 return
             }
 
 
             const dados = {
+                cliente: cliente,
                 descricao: itemDesc,
                 quantidade: itemQtd,
                 valor_unitario: valorUnitario
@@ -153,9 +182,12 @@
             } catch (error) {
                 alert('Erro de conexão')
             }
+        }
 
-
-
+        function limparFiltros() {
+            document.getElementById('filtro-busca').value = '';
+            document.getElementById('filtro-status').value = '';
+            carregarPedidos();
         }
 
         carregarPedidos();
