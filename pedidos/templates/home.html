@@ -40,6 +40,24 @@
         </tbody>
     </table>
 
+    <div id="modal-novo-pedido" style="display: none;">
+        <div class="modal-content">
+            <h3>Novo Pedido</h3>
+            <p>Adicione o primeiro item para começar:</p>
+
+            <input type=" text" id="novo-item-desc" placeholder="Descrição"><br>
+            <input type="number" id="novo-item-qtd" placeholder="Qtd">
+            <input type="number" id="novo-item-valor" placeholder="Valor Unit." step="0.01"><br>
+
+            <div>
+                <button class="btn" onclick="fecharModal()">Cancelar</button>
+                <button class="btn" onclick="confirmarCriacaoPedido()">Criar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+
+
     <script>
         const tokenCSRF = "{{ csrf_token }}";
 
@@ -75,22 +93,6 @@
             }
         }
 
-        async function criarPedido() {
-            try {
-                const resposta = await fetch("{% url 'api_criar_pedido' %}", {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': tokenCSRF }
-                });
-
-                if (resposta.ok) {
-                    carregarPedidos();
-                } else {
-                    mostrarErro("Não foi possível criar o pedido.");
-                }
-            } catch (erro) {
-                mostrarErro("Erro na requisição.");
-            }
-        }
 
         function mostrarErro(texto) {
             const div = document.getElementById('mensagem-erro');
@@ -100,6 +102,16 @@
 
         function abrirPedido(id) {
             window.location.href = `/pedidos/${id}/`;
+        }
+
+
+
+        function criarPedido() {
+            document.getElementById('modal-novo-pedido').classList.add('ativo');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-novo-pedido').classList.remove('ativo');
         }
 
         carregarPedidos();

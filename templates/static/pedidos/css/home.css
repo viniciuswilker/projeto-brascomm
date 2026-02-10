@@ -59,3 +59,37 @@
         color: #f00;
         display: none;
     }
+
+    #modal-novo-pedido {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 10;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    #modal-novo-pedido.ativo {
+        display: flex !important;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 30px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .modal-content input {
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
