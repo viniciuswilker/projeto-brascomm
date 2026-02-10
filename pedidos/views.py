@@ -140,3 +140,36 @@ def listar_itens(request, pedido_id):
             'subtotal': float(i.subtotal)
         })
     return JsonResponse(lista_itens, safe=False)
+
+@csrf_exempt
+@login_required
+def adicionar_item(request, pedido_id):
+    
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+
+    if pedido.status != 'RACUNHO':
+        return JsonResponse({'error': 'Esse pedido já está fechado'}, status=400)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            desc = data.get('descricao')
+            qtd = int(data.get('quantidade', 0))
+            valor = float(data.get('valor_unitario', 0))
+
+            if not desc or qtd <= 0:
+                return JsonResponse({'error': 'Descrição e quantidades inválidas'}, status=400)
+            
+            ItemPedido.objects.create(
+                pedido=pedido,
+                descricao=desc,
+                quantidade=qtd,
+                valor_unitario=valor
+            )
+
+            return JsonResponse({'sucesso': True, 'total_pedido': float(pedido.total)})
+
+        except Exception as e:
+            return JsonResponse({'error': 'Erro ao processar dados.'}, status=400)
+

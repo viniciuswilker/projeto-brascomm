@@ -80,6 +80,15 @@
 
             }
 
+            const resposta = await fetch(`api/pedidos/${pedidoId}/itens/add/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': tokenCSRF
+                },
+                body: JSON.stringify(dados)
+            })
+
         }
 
 
