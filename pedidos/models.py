@@ -43,7 +43,7 @@ class ItemPedido(models.Model):
 
         self.pedido.atualizar_total()
 
-    def delete(self, *arg, **kwargs):
+    def delete(self, *args, **kwargs):
         pedido = self.pedido
         super().delete(*args, **kwargs)
         pedido.atualizar_total()

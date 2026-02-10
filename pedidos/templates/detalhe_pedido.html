@@ -69,13 +69,17 @@
             itens.forEach(i => {
                 let botaoExcluir = ''
 
+                if (statusPedido === 'RASCUNHO') {
+                    botaoExcluir = `<button class="btn btn-excluir" onclick="removerItem(${i.id})">Remover</button>`;
+                }
+
                 corpo.innerHTML += `
                 <tr>   
                     <td>${i.descricao}</td>
                     <td>${i.quantidade}</td>
                     <td>${i.valor_unitario.toFixed(2)}</td>
                     <td>${i.subtotal.toFixed(2)}</td>
-                    <td>aaaa</td>
+                    <td>${botaoExcluir}</td>
                 </tr>
                 `
             });
@@ -166,10 +170,38 @@
 
             } catch (error) {
                 console.error("Erro na requisição:", erro)
-
-                alert('erro deconexão')
+                alert('erro de conexão')
             }
         }
+
+        async function removerItem(itemId) {
+            if (!confirm("Tem certeza que deseja remover esse item? "))
+                return
+
+            try {
+
+                const resposta = await fetch(`/api/itens/${itemId}/remover/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': tokenCSRF
+                    }
+                })
+
+                const resultado = await resposta.json()
+
+                if (resposta.ok) {
+                    document.getElementById('total-pedido').innerText = resultado.total_pedido.toFixed(2)
+                    carregarItens()
+                } else {
+                    alert("erro: " + (resultado.error || "Falha ao remover o item"))
+
+                }
+            } catch (error) {
+                console.error("Erro na requisição:", erro)
+                alert('erro de conexão')
+            }
+        }
+
 
         carregarItens();
     </script>
