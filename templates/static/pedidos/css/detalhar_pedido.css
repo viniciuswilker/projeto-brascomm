@@ -1,0 +1,12 @@
+body {
+    font-family: sans-serif;
+    margin: 40px;
+    color: #333;
+}
+
+table {
+    width: 60%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    text-align: center;
+}
