@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('home/', views.home, name='home'),
+    path('pedidos/<int:pedido_id>/', views.detalhar_pedido, name='detalhe_pedido'),
 
     path('api/pedidos/novo/', views.criar_pedido, name='api_criar_pedido'),
     path('api/pedidos/', views.listar_pedidos, name='api_listar_pedidos'),

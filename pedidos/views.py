@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -55,6 +55,15 @@ def home(request):
 
     return render(request, 'home.html', contexto)
 
+
+@login_required
+def detalhar_pedido(request, pedido_id):
+
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    contexto = {
+        'pedido': pedido
+    }
+    return render(request, 'detalhe_pedido.html', contexto)
 
 
 @login_required
