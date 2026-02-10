@@ -16,13 +16,75 @@
         <p id="total-pedido">Total: R${{ pedido.total}}</p>
     </div>
 
-    {% if pedidos.status == 'RASCUNHO' %}
-
+    {% if pedido.status == 'RASCUNHO' %}
+    <div class="formulario-item">
+        <h3>Adicionar Novo Item</h3>
+        <input type="text" id="desc" placeholder="Descrição do item">
+        <input type="number" id="qtd" placeholder="Qtd" style="width: 60px;">
+        <input type="number" id="valor" placeholder="Valor Unitário" step="0.01">
+        <button class="btn" onclick="adicionarItem()">Adicionar Item</button>
+    </div>
     {% else %}
-
+    <div>
+        <p>Aviso: Este pedido está {{ pedido.status }} e não pode mais ser editado.</p>
+    </div>
     {% endif %}
 
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Quantidade</th>
+                <th>Valor unitário</th>
+                <th>Subtotal</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-itens">
 
+        </tbody>
+    </table>
+
+    <script>
+
+        const pedidoId = "{{ pedido.id }}";
+        const statusPedido = "{{ pedido.status }}";
+        const tokenCSRF = "{{ csrf_token }}"
+
+        async function carregarItens() {
+            const resposta = await fetch(`api/pedido/${pedidoId}/itens/`)
+            const itens = await resposta.json()
+            const corpo = document.getElementById('tabela-itens')
+            corpo.innerHTML = ''
+
+            itens.forEach(i => {
+                let botaoExcluir = ''
+
+                corpo.innerHTML += `
+                <tr>   
+                    <td>${i.descricao}</td>
+                    <td>${i.quantidade}</td>
+                    <td>${i.valor_unitario.toFixed(2)}</td>
+                    <td>${i.subtotal.toFixed(2)}</td>
+                    <td>aaaa</td>
+                </tr>
+                `
+            });
+        }
+
+        async function adicionarItem() {
+            const dados = {
+                descricao: document.getElementById('desc').value,
+                quantidade: document.getElementById('qtd').value,
+                valor_unitario: document.getElementById('valor').value
+
+            }
+
+        }
+
+
+
+    </script>
 </body>
 
 </html>

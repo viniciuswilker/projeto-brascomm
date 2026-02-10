@@ -122,3 +122,21 @@ def listar_pedidos(request):
         })
         
     return JsonResponse(lista_final, safe=False)
+
+# itens
+@login_required
+def listar_itens(request, pedido_id):
+
+    itens = ItemPedido.objects.filter(pedido_id=pedido_id)
+
+    lista_itens = []
+
+    for i in itens:
+        lista_itens.append({
+            'id': i.id,
+            'descricao': i.descricao,
+            'quantidade': i.quantidade,
+            'valor_unitario': float(i.valor_unitario),
+            'subtotal': float(i.subtotal)
+        })
+    return JsonResponse(lista_itens, safe=False)
