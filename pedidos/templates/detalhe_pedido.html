@@ -43,9 +43,9 @@
     {% if pedido.status == 'RASCUNHO' %}
     <div class="formulario-item">
         <h3>Adicionar Novo Item</h3>
-        <input type="text" id="desc" placeholder="Descrição do item">
-        <input type="number" id="qtd" placeholder="Qtd" style="width: 60px;">
-        <input type="number" id="valor" placeholder="Valor Unitário" step="0.01">
+        <input type="text" id="desc" placeholder="Descrição do item" required>
+        <input type="number" id="qtd" placeholder="Qtd" style="width: 60px;" required>
+        <input type="number" id="valor" placeholder="Valor Unitário" step="0.01" required>
         <button class="btn" onclick="adicionarItem()">Adicionar Item</button>
     </div>
     {% else %}
@@ -101,10 +101,19 @@
         }
 
         async function adicionarItem() {
+            const descricao = document.getElementById('desc').value
+            const quantidade = document.getElementById('qtd').value
+            const valorUnitario = document.getElementById('valor').value
+
+            if (!descricao || !quantidade || !valorUnitario) {
+                alert('Preencha todos os dados')
+                return
+            }
+
             const dados = {
-                descricao: document.getElementById('desc').value,
-                quantidade: document.getElementById('qtd').value,
-                valor_unitario: document.getElementById('valor').value
+                descricao,
+                quantidade: quantidade,
+                valor_unitario: valorUnitario
 
             }
 
